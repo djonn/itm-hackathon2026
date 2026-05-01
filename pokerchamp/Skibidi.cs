@@ -1,34 +1,31 @@
 using PokerMind.Client;
-using System.Text.Json;
+using PokerMind.Client.Model;
 
 public class Skibidi
 {
-
-    private static readonly string API_BASE_URL = "https://pokermind.itmindsinternal.dk";
-    private static readonly string API_KEY = "Sk1bid1 R1zz";
-
     private readonly ApiClient client;
+    private readonly string playerId;
+    private readonly string suiteId;
 
-    public Skibidi()
+    public Skibidi(ApiClient client, string playerId, string suiteId)
     {
-        client = new ApiClient(API_BASE_URL, API_KEY);
+        this.client = client;
+        this.playerId = playerId;
+        this.suiteId = suiteId;
     }
 
     public async Task Loop()
     {
-        var suites = await client.NextGames("18f3da17-8e7d-4893-8f28-49e0fcde77ec", "stine");
-
-        if(suites is null)
+        var iterationsLeft = 10;
+        while (iterationsLeft-- > 0)
         {
-            throw new Exception("Failed to fetch suites");
+            var game = await client.NextGames(suiteId, playerId);
+            game!.Games.ForEach(PlayGame);
         }
+    }
 
-        Console.WriteLine(JsonSerializer.Serialize(suites, new JsonSerializerOptions { WriteIndented = true }));
-
-        while (true)
-        {
-            Console.WriteLine("Skibidi bop yes yes yes");
-            Thread.Sleep(1000);
-        }
+    private void PlayGame(Game game)
+    {
+        Console.WriteLine($"Player {playerId} is playing game {game.Id} with cards {string.Join(", ", game.Player.CurrentHand)}");
     }
 }
