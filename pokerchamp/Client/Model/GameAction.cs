@@ -25,6 +25,7 @@ public sealed class GameAction
                 "fold" => ActionType.Fold,
                 "check" => ActionType.Check,
                 "call" => ActionType.Call,
+                "raise" => ActionType.Raise,
                 "all_in" => ActionType.AllIn,
                 "raise" => ActionType.Raise,
                 _ => throw new ArgumentException($"Invalid action type: {actionType}")
@@ -47,6 +48,9 @@ public enum ActionType
 
     [JsonStringEnumMemberName("call")]
     Call,
+
+    [JsonStringEnumMemberName("raise")]
+    Raise,
 
     [JsonStringEnumMemberName("all_in")]
     AllIn,

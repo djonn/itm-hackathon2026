@@ -27,9 +27,12 @@ public static class PreflopChart
 
         return action switch
         {
-            "fold" => game.Player.CurrentBet == 0 ? ("check", null) : ("fold", null),
-            "check" => game.Player.CurrentBet == 0 ? ("check", null) : ("call", null),
-            "call" => ("call", null),
+            // Only fold if not matching the current bet
+            "fold" => game.HighestRaise == game.Player.CurrentBet ? ("check", null) : ("fold", null),
+            // Only check if not facing a raise, else fold
+            "check" => game.Player.CurrentBet < game.HighestRaise ? ("fold", null) : ("check", null),
+            // Only call if not matching the current bet, else check
+            "call" => game.HighestRaise == game.Player.CurrentBet ? ("check", null) : ("call", null),
             "raise" => CalculateRaise(game, value),
             _ => Fallback(game),
         };
@@ -44,10 +47,18 @@ public static class PreflopChart
             raiseMultiplier = 1.5 + ((value - ActionSettings.RaiseConfig.RaiseThreshold) / 100.0) * 1.5;
         }
 
-        var raiseAmount = (int)Math.Max(
-            game.BigBlindAmount * raiseMultiplier,
-            game.Player.CurrentBet + game.BigBlindAmount
-        );
+        var initialRaise = game.BigBlindAmount * raiseMultiplier;
+        bool shouldCall = initialRaise < game.HighestRaise;
+        if (shouldCall)
+            return ("call", null);
+
+        bool canRaiseWithInitial = initialRaise > game.HighestRaise + game.RaiseAmount;
+        if (!canRaiseWithInitial)
+            return ("call", null);
+        
+        var raiseAmount = (int)Math.Max(initialRaise, game.RaiseAmount);
+        if (raiseAmount >= game.Player.RemainingChips)
+            return ("all_in", game.Player.RemainingChips);
 
         return ("raise", raiseAmount);
     }
