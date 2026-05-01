@@ -1,4 +1,5 @@
 using PokerMind.Client;
+using PokerChamp;
 
 Console.WriteLine("Starting PokerChamp...");
 
@@ -14,6 +15,8 @@ List<string> players = new List<string>
 
 var game = await client.StartSuite(1, players);
 var suiteId = game.SuiteId;
+
+Console.WriteLine($"Started suite with ID: {suiteId}");
 
 
 var player1 = new Skibidi(client, players[0], suiteId);
