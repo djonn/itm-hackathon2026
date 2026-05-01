@@ -1,49 +1,23 @@
-﻿using PokerBot;
+using PokerMind.Client;
 
-Console.WriteLine("Starting Poker Bot...");
+Console.WriteLine("Starting PokerChamp...");
 
-var client = new HttpPokerApiClient();
 
-try
+string API_BASE_URL = "https://pokermind.itmindsinternal.dk";
+string API_KEY = "Sk1bid1 R1zz";
+var client = new ApiClient(API_BASE_URL, API_KEY);
+
+List<string> players = new List<string>
 {
-    var request = new StartSuiteRequest([new("player1", 10000), new("player2", 10000)]);
-    var response = await client.StartSuiteAsync(request);
-    Console.WriteLine($"Started suite {response.SuiteId}");
+    "big_natty", "shrek"
+};
 
-    string suiteId = response.SuiteId;
-    string playerId = "player1";
+var game = await client.StartSuite(1, players);
+var suiteId = game.SuiteId;
 
-    while (true)
-    {
-        var games = await client.GetNextGamesAsync(suiteId, playerId);
-        if (games.Count == 0)
-        {
-            Console.WriteLine("No more games, closing suite");
-            await client.CloseSuiteAsync(suiteId);
-            break;
-        }
 
-        foreach (var game in games)
-        {
-            var action = Bot.DecideAction(game);
-            var actionRequest = new ActionRequest(suiteId, playerId, action.Action, action.Amount);
-            try
-            {
-                var newState = await client.SubmitActionAsync(actionRequest);
-                Console.WriteLine($"Submitted {action.Action} for game {game.Id}, new phase {newState.Phase}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error submitting action: {ex.Message}");
-            }
-        }
+var player1 = new Skibidi(client, players[0], suiteId);
+var player2 = new Skibidi(client, players[1], suiteId);
 
-        await Task.Delay(1000); // poll every 1s
-    }
 
-    Console.WriteLine("Bot finished.");
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
+Task.WaitAll(player1.Loop(), player2.Loop());
