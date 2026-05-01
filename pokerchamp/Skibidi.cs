@@ -1,5 +1,3 @@
-using Microsoft.Kiota.Abstractions.Authentication;
-using Microsoft.Kiota.Http.HttpClientLibrary;
 using PokerMind.Client;
 using System.Text.Json;
 
@@ -12,14 +10,10 @@ public class Skibidi
 
     public Skibidi()
     {
-        var authProvider = new ApiKeyAuthenticationProvider(API_KEY, "authorization", ApiKeyAuthenticationProvider.KeyLocation.Header);
-        var adapter = new HttpClientRequestAdapter(authProvider);
-        client = new ApiClient(adapter);
     }
 
     public async Task Loop()
     {
-        var suites = await client.Api.Suites.GetAsync();
 
         if(suites is null)
         {
