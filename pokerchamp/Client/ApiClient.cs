@@ -36,5 +36,18 @@ public sealed class ApiClient
         var suite = await response.Content.ReadFromJsonAsync<StartSuiteResponse?>(cancellationToken);
         return suite ?? throw new InvalidOperationException("Response content was null");
     }
+
+    public async Task PostAction(GameAction action, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync("/api/action", action, cancellationToken);
+
+        if(!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            Console.WriteLine($"Failed to post action: {response.StatusCode}, content: {errorContent}");
+        }
+
+        response.EnsureSuccessStatusCode();
+    }
 }
  

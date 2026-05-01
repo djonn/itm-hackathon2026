@@ -2,6 +2,8 @@ using PokerBot;
 using PokerMind.Client;
 using PokerMind.Client.Model;
 
+namespace PokerChamp;
+
 public class Skibidi
 {
     private readonly ApiClient client;
@@ -17,17 +19,29 @@ public class Skibidi
 
     public async Task Loop()
     {
-        var iterationsLeft = 10;
-        while (iterationsLeft-- > 0)
+        while (true)
         {
-            var game = await client.NextGames(suiteId, playerId);
-            game!.Games.ForEach(PlayGame);
+            var nextGamesResponse = await client.NextGames(suiteId, playerId) ?? throw new Exception("Received null response from NextGames");
+
+            if (nextGamesResponse.AllGamesFinished)
+            {
+                Console.WriteLine($"{playerId} sees that all games are finished.");
+                break;
+            }
+
+            var playGameTasks = nextGamesResponse!.Games.Select(PlayGame);
+            await Task.WhenAll(playGameTasks);
         }
     }
 
-    private void PlayGame(Game game)
+    private Task PlayGame(Game game)
     {
+        Console.WriteLine($"[{game.Player.Id}] Deciding action...");
+
         var (action, amount) = Bot.DecideAction(game);
-        Console.WriteLine($"{playerId} decides to {action} {(amount.HasValue ? amount.Value.ToString() : "")}");
+        Console.WriteLine($"[{game.Player.Id}] Decided {action} {(amount.HasValue ? amount.Value.ToString() : "")}");
+
+        var gameAction = GameAction.New(action, amount, game.Id, playerId);
+        return client.PostAction(gameAction);
     }
 }
