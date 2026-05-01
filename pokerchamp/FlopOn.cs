@@ -5,7 +5,6 @@ public class FlopOn
 {
     public static (string Action, int? Amount) DecideAction(PokerMind.Client.Model.Game game)
     {
-
         var imLastPlayer = game.OtherPlayers.All(p => p.State == PlayerState.InactiveInHand);
         if(imLastPlayer)
         {
@@ -13,6 +12,7 @@ public class FlopOn
         }
 
         var (myRanking, myCategory) = rankHand(game);
+        Console.WriteLine($"[{game.Player.Id}] Rank: {myRanking}, Category: {myCategory}");
 
         return myCategory switch
         {
@@ -36,17 +36,6 @@ public class FlopOn
 
         int ranking = HoldemHandEvaluator.GetHandRanking([..playerHand, ..communityCards]);
         var category = HoldemHandEvaluator.GetHandCategory(ranking);
-
-        var log = $"""
-        {string.Join("\n", playerHand.Select(c => Formatter.FormatCard(c.ToClient())))}
-
-        {string.Join("\n", communityCards.Select(c => Formatter.FormatCard(c.ToClient())))}
-
-        Hand ranking: {ranking}
-        Hand category: {category}
-        """;
-
-        Console.WriteLine(log);
 
         return (ranking, category);
     }

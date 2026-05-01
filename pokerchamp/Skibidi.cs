@@ -34,10 +34,15 @@ public class Skibidi
 
     private Task PlayGame(Game game)
     {
-        Console.WriteLine($"[{game.Player.Id}] Deciding action...");
+        Console.WriteLine($"\n________________________________________________________________________");
+        Console.WriteLine($"[{game.Player.Id}] Hand #{game.HandsPlayed}");
+        Console.WriteLine($"[{game.Player.Id}] Current hand: {string.Join(", ", game.Player.CurrentHand.Select(c => Formatter.FormatCard(c)))}");
+        Console.WriteLine($"[{game.Player.Id}] Chips: {game.Player.RemainingChips}");
+        Console.WriteLine($"[{game.Player.Id}] Highest raise: {game.HighestRaise}");
+        Console.WriteLine($"[{game.Player.Id}] Pot: {game.Pot}");
 
         var (action, amount) = Bot.DecideAction(game);
-        Console.WriteLine($"[{game.Player.Id}] Decided {action} {(amount.HasValue ? amount.Value.ToString() : "")}");
+        Console.WriteLine($"[{game.Player.Id}] {action.ToUpper()} {(amount.HasValue ? amount.Value.ToString() : "")}");
 
         var gameAction = GameAction.New(action, amount, game.Id, playerId);
         return client.PostAction(gameAction);
