@@ -11,9 +11,6 @@ public static class Bot
             return PreflopChart.GetAction(game);
         }
         
-        if (game.Player.CurrentBet < game.BigBlindAmount)
-            return ("check", null);
-        else
-            return ("call", null);
+        return FlopOn.DecideAction(game);
     }
 }
