@@ -1,0 +1,717 @@
+{
+    "components": {
+        "responses": {},
+        "schemas": {
+            "ActionRequest": {
+                "discriminator": {
+                    "propertyName": "action",
+                    "mapping": {
+                        "fold": "#/components/schemas/BasicAction",
+                        "check": "#/components/schemas/BasicAction",
+                        "call": "#/components/schemas/BasicAction",
+                        "all_in": "#/components/schemas/BasicAction",
+                        "raise": "#/components/schemas/RaiseAction"
+                    }
+                },
+                "oneOf": [
+                    {
+                        "properties": {
+                            "action": {
+                                "enum": [
+                                    "fold",
+                                    "check",
+                                    "call",
+                                    "all_in"
+                                ],
+                                "type": "string"
+                            },
+                            "game_id": {
+                                "type": "string"
+                            },
+                            "player_id": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "player_id",
+                            "game_id",
+                            "action"
+                        ],
+                        "title": "BasicAction",
+                        "type": "object"
+                    },
+                    {
+                        "properties": {
+                            "action": {
+                                "enum": [
+                                    "raise"
+                                ],
+                                "type": "string"
+                            },
+                            "amount": {
+                                "description": "Total amount to raise to",
+                                "type": "integer"
+                            },
+                            "game_id": {
+                                "type": "string"
+                            },
+                            "player_id": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "player_id",
+                            "game_id",
+                            "action",
+                            "amount"
+                        ],
+                        "title": "RaiseAction",
+                        "type": "object"
+                    }
+                ],
+                "title": "ActionRequest"
+            },
+            "BadRequest": {
+                "properties": {
+                    "error": {
+                        "example": "Bad request",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "error"
+                ],
+                "title": "BadRequest",
+                "type": "object"
+            },
+            "BasicAction": {
+                "properties": {
+                    "action": {
+                        "enum": [
+                            "fold",
+                            "check",
+                            "call",
+                            "all_in"
+                        ],
+                        "type": "string"
+                    },
+                    "game_id": {
+                        "type": "string"
+                    },
+                    "player_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "player_id",
+                    "game_id",
+                    "action"
+                ],
+                "title": "BasicAction",
+                "type": "object"
+            },
+            "Card": {
+                "properties": {
+                    "rank": {
+                        "description": "Card rank (1-13). Ace = 1, Jack = 11, Queen = 12, King = 13",
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13
+                        ],
+                        "type": "integer"
+                    },
+                    "suit": {
+                        "description": "Card suit",
+                        "enum": [
+                            "clubs",
+                            "diamonds",
+                            "hearts",
+                            "spades"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "rank",
+                    "suit"
+                ],
+                "title": "Card",
+                "type": "object"
+            },
+            "CloseSuiteParameters": {
+                "description": "Required parameters for closing a suite",
+                "properties": {
+                    "suite_id": {
+                        "description": "Id of suite to close",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "suite_id"
+                ],
+                "title": "Close Suite Parameters",
+                "type": "object"
+            },
+            "CloseSuiteResponse": {
+                "description": "Response for closing a suite",
+                "properties": {},
+                "title": "Close Suite Response",
+                "type": "object"
+            },
+            "Game": {
+                "properties": {
+                    "big_blind_amount": {
+                        "description": "Current big blind amount",
+                        "type": "integer"
+                    },
+                    "community_cards": {
+                        "description": "Cards on the table",
+                        "items": {
+                            "$ref": "#/components/schemas/Card"
+                        },
+                        "type": "array"
+                    },
+                    "current_player_id": {
+                        "description": "Player to act",
+                        "type": "string"
+                    },
+                    "hands_played": {
+                        "description": "Number of hands currently played for this table",
+                        "type": "integer"
+                    },
+                    "highest_raise": {
+                        "description": "Current bet to match",
+                        "type": "integer"
+                    },
+                    "id": {
+                        "description": "Game ID",
+                        "type": "string"
+                    },
+                    "other_players": {
+                        "description": "List of other players in the game",
+                        "items": {
+                            "$ref": "#/components/schemas/Player"
+                        },
+                        "type": "array"
+                    },
+                    "phase": {
+                        "description": "Current phase of the betting round",
+                        "enum": [
+                            "pre_flop",
+                            "flop",
+                            "turn",
+                            "river",
+                            "game_finished"
+                        ],
+                        "type": "string"
+                    },
+                    "player": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Player"
+                            },
+                            {
+                                "properties": {
+                                    "current_hand": {
+                                        "description": "Your hand",
+                                        "items": {
+                                            "$ref": "#/components/schemas/Card"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "required": [
+                                    "current_hand"
+                                ],
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "pot": {
+                        "description": "Current size of the pot",
+                        "type": "integer"
+                    },
+                    "raise_amount": {
+                        "description": "The lowest possible raise to perform",
+                        "type": "integer"
+                    },
+                    "small_blind_id": {
+                        "description": "Small blind player",
+                        "type": "string"
+                    },
+                    "winner": {
+                        "description": "The winner of the table",
+                        "nullable": true,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "player",
+                    "other_players",
+                    "phase",
+                    "pot",
+                    "community_cards",
+                    "small_blind_id",
+                    "current_player_id",
+                    "highest_raise",
+                    "big_blind_amount",
+                    "raise_amount",
+                    "winner",
+                    "hands_played"
+                ],
+                "title": "Game",
+                "type": "object"
+            },
+            "GameResponse": {
+                "description": "A list of upcoming games",
+                "properties": {
+                    "all_games_finished": {
+                        "description": "All games in the suite are finished",
+                        "type": "boolean"
+                    },
+                    "games": {
+                        "items": {
+                            "$ref": "#/components/schemas/Game"
+                        },
+                        "type": "array"
+                    },
+                    "overall_winners": {
+                        "description": "The overall winners of the suite",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true,
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "games",
+                    "all_games_finished",
+                    "overall_winners"
+                ],
+                "title": "GameResponse",
+                "type": "object"
+            },
+            "InternalServerError": {
+                "properties": {
+                    "error": {
+                        "example": "Internal server error",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "error"
+                ],
+                "title": "InternalServerError",
+                "type": "object"
+            },
+            "NotFound": {
+                "properties": {
+                    "error": {
+                        "example": "Not found",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "error"
+                ],
+                "title": "NotFound",
+                "type": "object"
+            },
+            "Player": {
+                "properties": {
+                    "current_bet": {
+                        "description": "Current bet this betting round",
+                        "type": "integer"
+                    },
+                    "has_acted": {
+                        "description": "Whether the player has acted in this betting round",
+                        "type": "boolean"
+                    },
+                    "id": {
+                        "description": "Player ID",
+                        "type": "string"
+                    },
+                    "remaining_chips": {
+                        "description": "Remaining chips",
+                        "type": "integer"
+                    },
+                    "state": {
+                        "description": "Current state of the player",
+                        "enum": [
+                            "active_in_hand",
+                            "inactive_in_hand",
+                            "all_in",
+                            "out_of_chips"
+                        ],
+                        "type": "string"
+                    },
+                    "total_contributed": {
+                        "description": "Total contribution of chips this betting round",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "remaining_chips",
+                    "state",
+                    "has_acted",
+                    "current_bet",
+                    "total_contributed"
+                ],
+                "title": "Player",
+                "type": "object"
+            },
+            "RaiseAction": {
+                "properties": {
+                    "action": {
+                        "enum": [
+                            "raise"
+                        ],
+                        "type": "string"
+                    },
+                    "amount": {
+                        "description": "Total amount to raise to",
+                        "type": "integer"
+                    },
+                    "game_id": {
+                        "type": "string"
+                    },
+                    "player_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "player_id",
+                    "game_id",
+                    "action",
+                    "amount"
+                ],
+                "title": "RaiseAction",
+                "type": "object"
+            },
+            "StartSuiteParameters": {
+                "description": "Required parameters for starting a new suite",
+                "properties": {
+                    "num_games": {
+                        "description": "Number of games to start for suite",
+                        "type": "integer"
+                    },
+                    "players": {
+                        "description": "List of player ID's",
+                        "items": {
+                            "description": "Player ID",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "players"
+                ],
+                "title": "Start Suite Parameters",
+                "type": "object"
+            },
+            "StartSuiteResponse": {
+                "description": "Response for start a new suite",
+                "properties": {
+                    "suite_id": {
+                        "description": "ID of the start suite",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "suite_id"
+                ],
+                "title": "Start Suite Response",
+                "type": "object"
+            },
+            "SuitesResponse": {
+                "additionalProperties": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "description": "Suites and their associated players",
+                "title": "SuitesResponse",
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "authorization": {
+                "in": "header",
+                "name": "authorization",
+                "type": "apiKey"
+            }
+        }
+    },
+    "info": {
+        "title": "PokerMind",
+        "version": "0.1.0"
+    },
+    "openapi": "3.0.0",
+    "paths": {
+        "/api/action": {
+            "post": {
+                "callbacks": {},
+                "operationId": "PokerMindWeb.GameController.perform_action",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionRequest"
+                            }
+                        }
+                    },
+                    "description": "Action params",
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Game"
+                                }
+                            }
+                        },
+                        "description": "Updated game state"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BadRequest"
+                                }
+                            }
+                        },
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFound"
+                                }
+                            }
+                        },
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternalServerError"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "summary": "Submit a player action",
+                "tags": []
+            }
+        },
+        "/api/close_suite": {
+            "delete": {
+                "callbacks": {},
+                "operationId": "PokerMindWeb.GameController.close_suite",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CloseSuiteParameters"
+                            }
+                        }
+                    },
+                    "description": "Close suite params",
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloseSuiteResponse"
+                                }
+                            }
+                        },
+                        "description": "Closed suite"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BadRequest"
+                                }
+                            }
+                        },
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFound"
+                                }
+                            }
+                        },
+                        "description": "Not found"
+                    }
+                },
+                "summary": "Close a game suite",
+                "tags": []
+            }
+        },
+        "/api/next_games": {
+            "get": {
+                "callbacks": {},
+                "operationId": "PokerMindWeb.GameController.next_games",
+                "parameters": [
+                    {
+                        "description": "Your ID",
+                        "in": "query",
+                        "name": "player_id",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Suite ID",
+                        "in": "query",
+                        "name": "suite_id",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GameResponse"
+                                }
+                            }
+                        },
+                        "description": "List of games"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BadRequest"
+                                }
+                            }
+                        },
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFound"
+                                }
+                            }
+                        },
+                        "description": "Not found"
+                    }
+                },
+                "summary": "List upcoming games",
+                "tags": []
+            }
+        },
+        "/api/start_suite": {
+            "post": {
+                "callbacks": {},
+                "operationId": "PokerMindWeb.GameController.start_suite",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StartSuiteParameters"
+                            }
+                        }
+                    },
+                    "description": "Suite params",
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StartSuiteResponse"
+                                }
+                            }
+                        },
+                        "description": "Started new suite"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BadRequest"
+                                }
+                            }
+                        },
+                        "description": "Bad request"
+                    }
+                },
+                "summary": "Start a new game suite",
+                "tags": []
+            }
+        },
+        "/api/suites": {
+            "get": {
+                "callbacks": {},
+                "operationId": "PokerMindWeb.GameController.suites",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuitesResponse"
+                                }
+                            }
+                        },
+                        "description": "List of match suites and associated players"
+                    }
+                },
+                "summary": "List all match suites",
+                "tags": []
+            }
+        }
+    },
+    "security": [
+        {
+            "authorization": []
+        }
+    ],
+    "servers": [
+        {
+            "url": "https://pokermind.itmindsinternal.dk",
+            "variables": {}
+        }
+    ],
+    "tags": []
+}
