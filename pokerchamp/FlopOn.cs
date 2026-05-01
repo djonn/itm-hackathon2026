@@ -70,7 +70,7 @@ public class FlopOn
 
     private static (string, int?) CallOrCheck(PokerMind.Client.Model.Game game)
     {
-        if (game.Player.CurrentBet < game.RaiseAmount)
+        if (game.Player.CurrentBet < game.HighestRaise)
             return ("call", null);
         else
             return ("check", null);
