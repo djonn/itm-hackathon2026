@@ -4,8 +4,8 @@ using PokerChamp;
 Console.WriteLine("Starting PokerChamp...");
 
 
-string API_BASE_URL = "https://pokermind.itmindsinternal.dk";
-string API_KEY = "Sk1bid1 R1zz";
+string API_BASE_URL = "http://localhost:4000";
+string API_KEY = "test-secret";
 var client = new ApiClient(API_BASE_URL, API_KEY);
 
 List<string> players = new List<string>

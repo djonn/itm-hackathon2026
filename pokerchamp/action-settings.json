@@ -1,0 +1,12 @@
+{
+  "action_thresholds": {
+    "fold": { "min": 0, "max": 19 },
+    "check": { "min": 20, "max": 49 },
+    "call": { "min": 50, "max": 79 },
+    "raise": { "min": 80, "max": 100 }
+  },
+  "raise_config": {
+    "base_multiplier": 2.0,
+    "scale_with_value": true
+  }
+}
