@@ -8,7 +8,9 @@ public static class Bot
     {
         if (game.Phase == GamePhase.PreFlop)
         {
-            return PreflopChart.GetAction(game);
+           // return PreflopChart.GetAction(game);
+
+            return game.Player.CurrentBet < game.BigBlindAmount ? ("call", null) : ("check", null);
         }
         
         return FlopOn.DecideAction(game);
