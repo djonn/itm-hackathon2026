@@ -19,19 +19,17 @@ public class Skibidi
 
     public async Task Loop()
     {
-        while (true)
+        GameResponse? nextGamesResponse = await client.NextGames(suiteId, playerId) ?? throw new Exception("Received null response from NextGames");
+        do
         {
-            var nextGamesResponse = await client.NextGames(suiteId, playerId) ?? throw new Exception("Received null response from NextGames");
-
-            if (nextGamesResponse.AllGamesFinished)
-            {
-                Console.WriteLine($"{playerId} sees that all games are finished.");
-                break;
-            }
+            nextGamesResponse = await client.NextGames(suiteId, playerId) ?? throw new Exception("Received null response from NextGames");
 
             var playGameTasks = nextGamesResponse!.Games.Select(PlayGame);
             await Task.WhenAll(playGameTasks);
-        }
+        } while (!nextGamesResponse.AllGamesFinished);
+
+        Console.WriteLine($"{playerId} sees that all games are finished.");
+        Console.WriteLine($"Winner: {string.Join(", ", nextGamesResponse.OverallWinners ?? [])}");
     }
 
     private Task PlayGame(Game game)
