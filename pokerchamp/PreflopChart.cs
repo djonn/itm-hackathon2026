@@ -50,11 +50,11 @@ public static class PreflopChart
         var initialRaise = game.BigBlindAmount * raiseMultiplier;
         bool shouldCall = initialRaise < game.HighestRaise;
         if (shouldCall)
-            return ("call", null);
+            return CallIfFacingRaise(game);
 
         bool canRaiseWithInitial = initialRaise > game.HighestRaise + game.RaiseAmount;
         if (!canRaiseWithInitial)
-            return ("call", null);
+            return CallIfFacingRaise(game);
         
         var raiseAmount = (int)Math.Max(initialRaise, game.RaiseAmount);
         if (raiseAmount >= game.Player.RemainingChips)
@@ -62,6 +62,9 @@ public static class PreflopChart
 
         return ("raise", raiseAmount);
     }
+
+    private static (string Action, int? Amount) CallIfFacingRaise(Game game) =>
+        game.HighestRaise == game.Player.CurrentBet ? ("check", null) : ("call", null);
 
     private static int LookupValue(string position, string hand)
     {
@@ -125,7 +128,7 @@ public static class PreflopChart
         if (game.Player.CurrentBet == 0)
             return ("check", null);
 
-        return ("call", null);
+        return CallIfFacingRaise(game);
     }
 
     private static PreflopChartDefinition LoadChartDefinition()
